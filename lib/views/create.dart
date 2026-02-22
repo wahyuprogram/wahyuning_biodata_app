@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:biodata_app/models/api.dart';
-import 'package:biodata_app/widgets/form.dart'; // Memanggil form yang tadi dibuat
+import 'package:biodata_app/widgets/form.dart'; 
 
 class Create extends StatefulWidget {
   const Create({super.key});
@@ -15,7 +15,6 @@ class Create extends StatefulWidget {
 class CreateState extends State<Create> {
   final formKey = GlobalKey<FormState>();
 
-  // Controller untuk menampung teks inputan
   final nisController = TextEditingController();
   final namaController = TextEditingController();
   final tpController = TextEditingController();
@@ -24,7 +23,6 @@ class CreateState extends State<Create> {
   final agamaController = TextEditingController();
   final alamatController = TextEditingController();
 
-  // Fungsi Mengirim Data ke PHP
   Future _simpan() async {
     try {
       final response = await http.post(
@@ -48,7 +46,6 @@ class CreateState extends State<Create> {
               backgroundColor: Colors.green,
               textColor: Colors.white);
           
-          // Kembali ke Home dan hilangkan halaman create dari history
           Navigator.of(context).pop(true); 
         } else {
           Fluttertoast.showToast(msg: "Gagal Menyimpan Data");
@@ -63,38 +60,53 @@ class CreateState extends State<Create> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.grey.shade50,
       appBar: AppBar(
-        title: const Text("Tambah Siswa"),
-        backgroundColor: Colors.blue,
-        foregroundColor: Colors.white,
+        title: const Text("Tambah Siswa", style: TextStyle(fontWeight: FontWeight.w600)),
+        centerTitle: true,
+        backgroundColor: Colors.white,
+        foregroundColor: Colors.black,
+        elevation: 0,
       ),
-      body: Container(
+      body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
-        child: AppForm(
-          formkey: formKey,
-          nisController: nisController,
-          namaController: namaController,
-          tpController: tpController,
-          tgController: tgController,
-          kelaminController: kelaminController,
-          agamaController: agamaController,
-          alamatController: alamatController,
+        child: Card(
+          elevation: 0,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+            side: BorderSide(color: Colors.grey.shade200),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(20),
+            child: AppForm(
+              formkey: formKey,
+              nisController: nisController,
+              namaController: namaController,
+              tpController: tpController,
+              tgController: tgController,
+              kelaminController: kelaminController,
+              agamaController: agamaController,
+              alamatController: alamatController,
+            ),
+          ),
         ),
       ),
       bottomNavigationBar: Padding(
         padding: const EdgeInsets.all(20.0),
         child: ElevatedButton(
           style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.green,
+            backgroundColor: Colors.blue,
             foregroundColor: Colors.white,
-            padding: const EdgeInsets.symmetric(vertical: 15),
+            padding: const EdgeInsets.symmetric(vertical: 16),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            elevation: 0,
           ),
           onPressed: () {
             if (formKey.currentState!.validate()) {
               _simpan();
             }
           },
-          child: const Text("SIMPAN", style: TextStyle(fontSize: 18)),
+          child: const Text("SIMPAN DATA", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
         ),
       ),
     );

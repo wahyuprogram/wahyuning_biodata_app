@@ -25,7 +25,6 @@ class EditState extends State<Edit> {
       agamaController,
       alamatController;
 
-  // Fungsi Update Data ke PHP
   Future editSw() async {
     return await http.post(
       Uri.parse(BaseUrl.edit),
@@ -51,17 +50,16 @@ class EditState extends State<Edit> {
           backgroundColor: Colors.green,
           textColor: Colors.white);
       
-      // Kembali ke layar sebelumnya (Details)
-      // Kita pakai pushNamedAndRemoveUntil agar langsung refresh total ke Home (opsional),
-      // tapi untuk simplenya kita pop saja
-       Navigator.of(context).pushNamedAndRemoveUntil('/', (Route<dynamic> route) => false);
+      // PERBAIKAN: Gunakan pop(true) agar alurnya nyambung dan Home me-refresh
+      Navigator.of(context).pop(true);
+    } else {
+      Fluttertoast.showToast(msg: "Gagal Menyimpan Data");
     }
   }
 
   @override
   void initState() {
     super.initState();
-    // Isi formulir dengan data lama siswa
     nisController = TextEditingController(text: widget.sw.nis);
     namaController = TextEditingController(text: widget.sw.nama);
     tpController = TextEditingController(text: widget.sw.tplahir);
@@ -74,11 +72,36 @@ class EditState extends State<Edit> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.grey.shade50,
       appBar: AppBar(
-        title: const Text("Edit Siswa"),
+        title: const Text("Edit Siswa", style: TextStyle(fontWeight: FontWeight.w600)),
         centerTitle: true,
-        backgroundColor: Colors.blue,
-        foregroundColor: Colors.white,
+        backgroundColor: Colors.white,
+        foregroundColor: Colors.black,
+        elevation: 0,
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(20),
+        child: Card(
+          elevation: 0,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+            side: BorderSide(color: Colors.grey.shade200),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(20),
+            child: AppForm(
+              formkey: formKey,
+              nisController: nisController,
+              namaController: namaController,
+              tpController: tpController,
+              tgController: tgController,
+              kelaminController: kelaminController,
+              agamaController: agamaController,
+              alamatController: alamatController,
+            ),
+          ),
+        ),
       ),
       bottomNavigationBar: Padding(
         padding: const EdgeInsets.all(20.0),
@@ -86,27 +109,16 @@ class EditState extends State<Edit> {
           style: ElevatedButton.styleFrom(
             backgroundColor: Colors.green,
             foregroundColor: Colors.white,
-            padding: const EdgeInsets.symmetric(vertical: 15),
+            padding: const EdgeInsets.symmetric(vertical: 16),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            elevation: 0,
           ),
           onPressed: () {
             if (formKey.currentState!.validate()) {
               _onConfirm(context);
             }
           },
-          child: const Text("UPDATE", style: TextStyle(fontSize: 18)),
-        ),
-      ),
-      body: Container(
-        padding: const EdgeInsets.all(20),
-        child: AppForm(
-          formkey: formKey,
-          nisController: nisController,
-          namaController: namaController,
-          tpController: tpController,
-          tgController: tgController,
-          kelaminController: kelaminController,
-          agamaController: agamaController,
-          alamatController: alamatController,
+          child: const Text("UPDATE DATA", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
         ),
       ),
     );

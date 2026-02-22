@@ -5,7 +5,7 @@ import 'package:biodata_app/models/api.dart';
 import 'package:biodata_app/models/msiswa.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
-import 'edit.dart'; // Nanti kita aktifkan setelah file edit.dart dibuat
+import 'edit.dart'; 
 
 class Details extends StatefulWidget {
   final SiswaModel sw;
@@ -17,7 +17,6 @@ class Details extends StatefulWidget {
 
 class DetailsState extends State<Details> {
   
-  // Fungsi Menghapus Data
   void deleteSiswa(context) async {
     http.Response response = await http.post(
       Uri.parse(BaseUrl.hapus),
@@ -31,26 +30,29 @@ class DetailsState extends State<Details> {
           msg: "Data Berhasil Dihapus",
           backgroundColor: Colors.red,
           textColor: Colors.white);
-      // Kembali ke Home dengan sinyal 'true' agar Home me-refresh list
       Navigator.of(context).pop(true);
     }
   }
 
-  // Fungsi Konfirmasi Hapus (Dialog)
   void confirmDelete(context) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           content: const Text('Apakah Anda yakin ingin menghapus data ini?'),
           actions: [
-            ElevatedButton(
+            TextButton(
               onPressed: () => Navigator.of(context).pop(),
-              child: const Icon(Icons.cancel),
+              child: const Text('Batal', style: TextStyle(color: Colors.grey)),
             ),
             ElevatedButton(
-              onPressed: () => deleteSiswa(context),
-              child: const Icon(Icons.check_circle),
+              style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+              onPressed: () {
+                Navigator.of(context).pop(); // Tutup dialog dulu
+                deleteSiswa(context); // Baru jalankan hapus
+              },
+              child: const Text('Hapus', style: TextStyle(color: Colors.white)),
             ),
           ],
         );
@@ -61,72 +63,82 @@ class DetailsState extends State<Details> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.grey.shade50,
       appBar: AppBar(
-        title: const Text("Detail Siswa"),
+        title: const Text("Detail Siswa", style: TextStyle(fontWeight: FontWeight.w600)),
         centerTitle: true,
-        backgroundColor: Colors.blue,
-        foregroundColor: Colors.white,
+        backgroundColor: Colors.white,
+        foregroundColor: Colors.black,
+        elevation: 0,
         actions: [
-          // Tombol Hapus (Tong Sampah) di pojok kanan atas
           IconButton(
             onPressed: () => confirmDelete(context),
-            icon: const Icon(Icons.delete),
+            icon: const Icon(Icons.delete_outline, color: Colors.red),
           ),
         ],
       ),
-      body: Container(
-        padding: const EdgeInsets.all(35),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              "ID : ${widget.sw.id}",
-              style: const TextStyle(fontSize: 20),
+      body: Center(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(20),
+          child: Card(
+            elevation: 0,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+              side: BorderSide(color: Colors.grey.shade200),
             ),
-            Text(
-              "NIS : ${widget.sw.nis}",
-              style: const TextStyle(fontSize: 20),
+            child: Padding(
+              padding: const EdgeInsets.all(24),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min, // Agar kotak menyesuaikan isi
+                children: [
+                  Center(
+                    child: CircleAvatar(
+                      radius: 40,
+                      backgroundColor: Colors.blue.shade50,
+                      child: const Icon(Icons.person, size: 50, color: Colors.blue),
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                  
+                  Text("ID : ${widget.sw.id}", style: const TextStyle(fontSize: 16, color: Colors.grey)),
+                  const SizedBox(height: 8),
+                  Text("NIS : ${widget.sw.nis}", style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                  const Divider(height: 30),
+                  
+                  Text("Nama : ${widget.sw.nama}", style: const TextStyle(fontSize: 18)),
+                  const SizedBox(height: 12),
+                  Text("Tempat Lahir : ${widget.sw.tplahir}", style: const TextStyle(fontSize: 18)),
+                  const SizedBox(height: 12),
+                  Text("Tanggal Lahir : ${widget.sw.tglahir}", style: const TextStyle(fontSize: 18)),
+                  const SizedBox(height: 12),
+                  Text("Jenis Kelamin : ${widget.sw.kelamin}", style: const TextStyle(fontSize: 18)),
+                  const SizedBox(height: 12),
+                  Text("Agama : ${widget.sw.agama}", style: const TextStyle(fontSize: 18)),
+                  const SizedBox(height: 12),
+                  Text("Alamat : ${widget.sw.alamat}", style: const TextStyle(fontSize: 18)),
+                ],
+              ),
             ),
-            const Padding(padding: EdgeInsets.all(10)),
-            Text(
-              "Nama : ${widget.sw.nama}",
-              style: const TextStyle(fontSize: 20),
-            ),
-            Text(
-              "Tempat Lahir : ${widget.sw.tplahir}",
-              style: const TextStyle(fontSize: 20),
-            ),
-            Text(
-              "Tanggal Lahir : ${widget.sw.tglahir}",
-              style: const TextStyle(fontSize: 20),
-            ),
-            Text(
-              "Jenis Kelamin : ${widget.sw.kelamin}",
-              style: const TextStyle(fontSize: 20),
-            ),
-            Text(
-              "Agama : ${widget.sw.agama}",
-              style: const TextStyle(fontSize: 20),
-            ),
-            Text(
-              "Alamat : ${widget.sw.alamat}",
-              style: const TextStyle(fontSize: 20),
-            ),
-          ],
+          ),
         ),
       ),
-      // Tombol Edit (Pensil)
       floatingActionButton: FloatingActionButton(
-        backgroundColor: Colors.blue,
+        backgroundColor: Colors.green,
         foregroundColor: Colors.white,
         child: const Icon(Icons.edit),
-        onPressed: () {
-          // Navigasi ke halaman Edit (Kita aktifkan nanti)
-          Navigator.of(context).push(
+        onPressed: () async {
+           // Menangkap sinyal 'true' dari halaman Edit
+           var result = await Navigator.of(context).push(
              MaterialPageRoute(
                builder: (BuildContext context) => Edit(sw: widget.sw),
              ),
            );
+           
+           // Jika sukses edit, langsung tutup detail & perbarui Home
+           if (result == true) {
+             Navigator.of(context).pop(true);
+           }
         },
       ),
     );
